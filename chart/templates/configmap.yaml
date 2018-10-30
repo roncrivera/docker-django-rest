@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-configmap
+  namespace: {{ .Release.Namespace }}
+data:
+  DJANGO_ENV: {{ .Values.env.DJANGO_ENV | quote }}
+  DJANGO_MANAGEPY_MIGRATE: {{ .Values.env.DJANGO_MANAGEPY_MIGRATE | quote }}
+  DJANGO_DB_NAME: {{ .Values.env.DJANGO_DB_NAME | quote }}
+  DJANGO_DB_HOST: {{ .Values.env.DJANGO_DB_HOST | quote }}
+  DJANGO_DB_PORT: {{ .Values.env.DJANGO_DB_PORT | quote }}
+  RUNDECK_URL: {{ .Values.env.RUNDECK_URL | quote }}
+  PTP_URL: {{ .Values.env.PTP_URL | quote }}
+  NO_PROXY: {{ .Values.env.NO_PROXY | quote }}

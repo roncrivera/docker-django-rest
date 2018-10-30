@@ -1,0 +1,8 @@
+apiVersion: v1
+description: A Helm chart for Kubernetes
+name: gatekeeper
+version: 0.1.0
+sources:
+  - https://github.com/roncrivera/docker-django-gatekeeper.git
+maintainers:
+  - name: Ron Rivera

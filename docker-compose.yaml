@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_DB: gatekeeper
+    ports:
+      - "5432:5432"
+  app:
+    environment:
+      - DJANGO_MANAGEPY_MIGRATE=true
+      - NO_PROXY
+      - MAIN_URL
+      - RUNDECK_AUTH_TOKEN
+      - RUNDECK_URL
+    build: .
+    volumes:
+      - .:/app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    links:
+      - db:gatekeeper-playground

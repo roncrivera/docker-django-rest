@@ -1,0 +1,56 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .Values.service.name }}
+  labels:
+    app: {{ template "vx-gatekeeper.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "vx-gatekeeper.name" . }}
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.service.internalPort }}
+          env:
+            - name: DJANGO_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: gatekeeper-postgresql
+                  key: gatekeeper-postgresql-username
+            - name: DJANGO_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: gatekeeper-postgresql
+                  key: gatekeeper-postgresql-password
+            - name: RUNDECK_AUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: gatekeeper-rundeck
+                  key: gatekeeper-rundeck-auth-token
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}-configmap
+          livenessProbe:
+            httpGet:
+              path: /api/v1/deployments/
+              port: {{ .Values.service.internalPort }}
+          readinessProbe:
+            httpGet:
+              path: /api/v1/deployments/
+              port: {{ .Values.service.internalPort }}
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+    {{- if .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+    {{- end }}
